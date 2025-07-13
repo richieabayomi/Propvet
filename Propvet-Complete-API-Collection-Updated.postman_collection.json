@@ -1,0 +1,833 @@
+{
+  "info": {
+    "name": "Propvet API Collection - Complete & Updated",
+    "description": "Complete and accurate API collection for Propvet - Property Verification System with Payment Integration. Updated to match actual backend implementation.",
+    "version": "2.1.0",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+  },
+  "variable": [
+    {
+      "key": "baseUrl",
+      "value": "http://localhost:5000",
+      "type": "string"
+    },
+    {
+      "key": "authToken",
+      "value": "",
+      "type": "string"
+    },
+    {
+      "key": "refreshToken",
+      "value": "",
+      "type": "string"
+    },
+    {
+      "key": "userId",
+      "value": "",
+      "type": "string"
+    },
+    {
+      "key": "verificationId",
+      "value": "",
+      "type": "string"
+    },
+    {
+      "key": "paymentReference",
+      "value": "",
+      "type": "string"
+    },
+    {
+      "key": "documentId",
+      "value": "",
+      "type": "string"
+    }
+  ],
+  "item": [
+    {
+      "name": "1. System Health & Info",
+      "description": "System health check and API information endpoints",
+      "item": [
+        {
+          "name": "Health Check",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/health",
+              "host": ["{{baseUrl}}"],
+              "path": ["health"]
+            },
+            "description": "Check if the API server is running and healthy"
+          },
+          "response": []
+        },
+        {
+          "name": "API Info",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/",
+              "host": ["{{baseUrl}}"]
+            },
+            "description": "Get basic API information and available endpoints"
+          },
+          "response": []
+        }
+      ]
+    },
+    {
+      "name": "2. Authentication",
+      "description": "User authentication and session management",
+      "item": [
+        {
+          "name": "Register User",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "if (pm.response.status === 'Created' || pm.response.code === 201) {",
+                  "    const response = pm.response.json();",
+                  "    if (response.data && response.data.tokens) {",
+                  "        pm.collectionVariables.set('authToken', response.data.tokens.accessToken);",
+                  "        pm.collectionVariables.set('refreshToken', response.data.tokens.refreshToken);",
+                  "        pm.collectionVariables.set('userId', response.data.user._id);",
+                  "    }",
+                  "}"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"email\": \"user@example.com\",\n  \"password\": \"Password123!\",\n  \"firstName\": \"John\",\n  \"lastName\": \"Doe\",\n  \"phoneNumber\": \"+2348123456789\"\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/auth/register",
+              "host": ["{{baseUrl}}"],
+              "path": ["auth", "register"]
+            },
+            "description": "Register a new user account"
+          },
+          "response": []
+        },
+        {
+          "name": "Login User",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "if (pm.response.status === 'OK' || pm.response.code === 200) {",
+                  "    const response = pm.response.json();",
+                  "    if (response.data && response.data.tokens) {",
+                  "        pm.collectionVariables.set('authToken', response.data.tokens.accessToken);",
+                  "        pm.collectionVariables.set('refreshToken', response.data.tokens.refreshToken);",
+                  "        pm.collectionVariables.set('userId', response.data.user._id);",
+                  "    }",
+                  "}"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"email\": \"user@example.com\",\n  \"password\": \"Password123!\"\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/auth/login",
+              "host": ["{{baseUrl}}"],
+              "path": ["auth", "login"]
+            },
+            "description": "Login with email and password"
+          },
+          "response": []
+        },
+        {
+          "name": "Refresh Token",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "if (pm.response.status === 'OK' || pm.response.code === 200) {",
+                  "    const response = pm.response.json();",
+                  "    if (response.data && response.data.tokens) {",
+                  "        pm.collectionVariables.set('authToken', response.data.tokens.accessToken);",
+                  "        pm.collectionVariables.set('refreshToken', response.data.tokens.refreshToken);",
+                  "    }",
+                  "}"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"refreshToken\": \"{{refreshToken}}\"\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/auth/refresh-token",
+              "host": ["{{baseUrl}}"],
+              "path": ["auth", "refresh-token"]
+            },
+            "description": "Refresh access token using refresh token"
+          },
+          "response": []
+        },
+        {
+          "name": "Forgot Password",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"email\": \"user@example.com\"\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/auth/forgot-password",
+              "host": ["{{baseUrl}}"],
+              "path": ["auth", "forgot-password"]
+            },
+            "description": "Request password reset email"
+          },
+          "response": []
+        },
+        {
+          "name": "Reset Password",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"token\": \"reset_token_here\",\n  \"newPassword\": \"NewPassword123!\"\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/auth/reset-password",
+              "host": ["{{baseUrl}}"],
+              "path": ["auth", "reset-password"]
+            },
+            "description": "Reset password using token from email"
+          },
+          "response": []
+        }
+      ]
+    },
+    {
+      "name": "3. User Management",
+      "description": "User profile and account management",
+      "item": [
+        {
+          "name": "Get All Users (Admin)",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{authToken}}"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/auth/users",
+              "host": ["{{baseUrl}}"],
+              "path": ["auth", "users"]
+            },
+            "description": "Get all users (Admin only)"
+          },
+          "response": []
+        },
+        {
+          "name": "Get User By ID",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{authToken}}"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/auth/user/{{userId}}",
+              "host": ["{{baseUrl}}"],
+              "path": ["auth", "user", "{{userId}}"]
+            },
+            "description": "Get specific user by ID"
+          },
+          "response": []
+        },
+        {
+          "name": "Update User Profile",
+          "request": {
+            "method": "PATCH",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{authToken}}"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"firstName\": \"Updated John\",\n  \"lastName\": \"Updated Doe\",\n  \"phoneNumber\": \"+2348123456790\"\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/auth/update-profile",
+              "host": ["{{baseUrl}}"],
+              "path": ["auth", "update-profile"]
+            },
+            "description": "Update current user's profile information"
+          },
+          "response": []
+        },
+        {
+          "name": "Update Password",
+          "request": {
+            "method": "PATCH",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{authToken}}"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"currentPassword\": \"Password123!\",\n  \"newPassword\": \"NewPassword123!\"\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/auth/update-password",
+              "host": ["{{baseUrl}}"],
+              "path": ["auth", "update-password"]
+            },
+            "description": "Update current user's password"
+          },
+          "response": []
+        },
+        {
+          "name": "Set User Status (Admin)",
+          "request": {
+            "method": "PATCH",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{authToken}}"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"userId\": \"{{userId}}\",\n  \"status\": \"ACTIVE\"\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/auth/set-user-status",
+              "host": ["{{baseUrl}}"],
+              "path": ["auth", "set-user-status"]
+            },
+            "description": "Set user status (Admin only)"
+          },
+          "response": []
+        }
+      ]
+    },
+    {
+      "name": "4. Verification Pricing",
+      "description": "Verification pricing management",
+      "item": [
+        {
+          "name": "Get All Verification Prices",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{authToken}}"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/verification/prices",
+              "host": ["{{baseUrl}}"],
+              "path": ["verification", "prices"]
+            },
+            "description": "Get all verification type prices"
+          },
+          "response": []
+        },
+        {
+          "name": "Get Single Verification Price",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{authToken}}"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/verification/price?type=NORMAL",
+              "host": ["{{baseUrl}}"],
+              "path": ["verification", "price"],
+              "query": [
+                {
+                  "key": "type",
+                  "value": "NORMAL",
+                  "description": "Verification type: NORMAL, EXPRESS, PREMIUM"
+                }
+              ]
+            },
+            "description": "Get price for specific verification type"
+          },
+          "response": []
+        },
+        {
+          "name": "Set Verification Price (Admin)",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{authToken}}"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"type\": \"EXPRESS\",\n  \"price\": 15000\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/verification/set-price",
+              "host": ["{{baseUrl}}"],
+              "path": ["verification", "set-price"]
+            },
+            "description": "Set price for specific verification type (Admin only)"
+          },
+          "response": []
+        }
+      ]
+    },
+    {
+      "name": "5. Verification Workflow",
+      "description": "Property verification process and management",
+      "item": [
+        {
+          "name": "Create Verification (with Payment)",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "if (pm.response.status === 'Created' || pm.response.code === 201) {",
+                  "    const response = pm.response.json();",
+                  "    if (response.data && response.data.verification) {",
+                  "        pm.collectionVariables.set('verificationId', response.data.verification._id);",
+                  "        if (response.data.payment && response.data.payment.reference) {",
+                  "            pm.collectionVariables.set('paymentReference', response.data.payment.reference);",
+                  "        }",
+                  "    }",
+                  "}"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{authToken}}"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"address\": \"123 Test Street, Lagos, Nigeria\",\n  \"state\": \"Lagos\",\n  \"type\": \"NORMAL\",\n  \"callbackUrl\": \"https://yourapp.com/payment/callback\"\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/verification/create",
+              "host": ["{{baseUrl}}"],
+              "path": ["verification", "create"]
+            },
+            "description": "Create new verification request with automatic payment initialization"
+          },
+          "response": []
+        },
+        {
+          "name": "Verify Payment",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{authToken}}"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"reference\": \"{{paymentReference}}\",\n  \"verificationId\": \"{{verificationId}}\"\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/verification/verify-payment",
+              "host": ["{{baseUrl}}"],
+              "path": ["verification", "verify-payment"]
+            },
+            "description": "Manually verify payment status"
+          },
+          "response": []
+        },
+        {
+          "name": "Payment Callback (Browser)",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/verification/payment-callback/{{verificationId}}?reference={{paymentReference}}&status=success",
+              "host": ["{{baseUrl}}"],
+              "path": ["verification", "payment-callback", "{{verificationId}}"],
+              "query": [
+                {
+                  "key": "reference",
+                  "value": "{{paymentReference}}"
+                },
+                {
+                  "key": "status",
+                  "value": "success"
+                }
+              ]
+            },
+            "description": "Payment callback endpoint (redirects to frontend)"
+          },
+          "response": []
+        },
+        {
+          "name": "Get All Verifications (Admin)",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{authToken}}"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/verification/all?page=1&limit=10",
+              "host": ["{{baseUrl}}"],
+              "path": ["verification", "all"],
+              "query": [
+                {
+                  "key": "page",
+                  "value": "1"
+                },
+                {
+                  "key": "limit",
+                  "value": "10"
+                }
+              ]
+            },
+            "description": "Get all verifications with pagination (Admin only)"
+          },
+          "response": []
+        },
+        {
+          "name": "Get User Verifications",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{authToken}}"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/verification/user/{{userId}}?page=1&limit=10",
+              "host": ["{{baseUrl}}"],
+              "path": ["verification", "user", "{{userId}}"],
+              "query": [
+                {
+                  "key": "page",
+                  "value": "1"
+                },
+                {
+                  "key": "limit",
+                  "value": "10"
+                }
+              ]
+            },
+            "description": "Get verifications for specific user with pagination"
+          },
+          "response": []
+        },
+        {
+          "name": "Get Verification by ID",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{authToken}}"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/verification/{{verificationId}}",
+              "host": ["{{baseUrl}}"],
+              "path": ["verification", "{{verificationId}}"]
+            },
+            "description": "Get detailed verification information by ID"
+          },
+          "response": []
+        },
+        {
+          "name": "Get Verification Timeline",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{authToken}}"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/verification/{{verificationId}}/timeline",
+              "host": ["{{baseUrl}}"],
+              "path": ["verification", "{{verificationId}}", "timeline"]
+            },
+            "description": "Get verification process timeline and status updates"
+          },
+          "response": []
+        }
+      ]
+    },
+    {
+      "name": "6. Document Management",
+      "description": "Document upload and management for verifications",
+      "item": [
+        {
+          "name": "Add Document to Verification",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "if (pm.response.status === 'Created' || pm.response.code === 201) {",
+                  "    const response = pm.response.json();",
+                  "    if (response.data && response.data.document) {",
+                  "        pm.collectionVariables.set('documentId', response.data.document._id);",
+                  "    }",
+                  "}"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{authToken}}"
+              }
+            ],
+            "body": {
+              "mode": "formdata",
+              "formdata": [
+                {
+                  "key": "verificationId",
+                  "value": "{{verificationId}}",
+                  "type": "text"
+                },
+                {
+                  "key": "name",
+                  "value": "Certificate of Occupancy",
+                  "type": "text",
+                  "description": "Document name/title"
+                },
+                {
+                  "key": "file",
+                  "type": "file",
+                  "src": [],
+                  "description": "Document file to upload"
+                }
+              ]
+            },
+            "url": {
+              "raw": "{{baseUrl}}/verification/add-document",
+              "host": ["{{baseUrl}}"],
+              "path": ["verification", "add-document"]
+            },
+            "description": "Upload document for verification (requires paid verification)"
+          },
+          "response": []
+        },
+        {
+          "name": "Update Document Status (Admin)",
+          "request": {
+            "method": "PATCH",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{authToken}}"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"documentId\": \"{{documentId}}\",\n  \"status\": \"APPROVED\"\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/verification/update-document-status",
+              "host": ["{{baseUrl}}"],
+              "path": ["verification", "update-document-status"]
+            },
+            "description": "Update document review status (Admin only)"
+          },
+          "response": []
+        },
+        {
+          "name": "Add Comment to Document",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{authToken}}"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"documentId\": \"{{documentId}}\",\n  \"content\": \"This document needs to be clearer. Please upload a better scan.\",\n  \"is_admin\": false\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/verification/add-comment",
+              "host": ["{{baseUrl}}"],
+              "path": ["verification", "add-comment"]
+            },
+            "description": "Add comment to document for communication"
+          },
+          "response": []
+        }
+      ]
+    },
+    {
+      "name": "7. Payment Webhooks",
+      "description": "Payment system webhooks and callbacks",
+      "item": [
+        {
+          "name": "Paystack Webhook",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "x-paystack-signature",
+                "value": "webhook_signature_here"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"event\": \"charge.success\",\n  \"data\": {\n    \"id\": 123456789,\n    \"reference\": \"{{paymentReference}}\",\n    \"amount\": 1000000,\n    \"status\": \"success\",\n    \"paid_at\": \"2025-01-01T12:00:00.000Z\",\n    \"metadata\": {\n      \"verificationId\": \"{{verificationId}}\",\n      \"userId\": \"{{userId}}\"\n    }\n  }\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/verification/payment-webhook",
+              "host": ["{{baseUrl}}"],
+              "path": ["verification", "payment-webhook"]
+            },
+            "description": "Paystack webhook endpoint for payment notifications"
+          },
+          "response": []
+        }
+      ]
+    }
+  ],
+  "event": [
+    {
+      "listen": "prerequest",
+      "script": {
+        "type": "text/javascript",
+        "exec": [
+          "// Auto-refresh token if needed",
+          "const authToken = pm.collectionVariables.get('authToken');",
+          "if (!authToken && pm.info.requestName !== 'Login User' && pm.info.requestName !== 'Register User') {",
+          "    console.log('No auth token found. Please login first.');",
+          "}"
+        ]
+      }
+    },
+    {
+      "listen": "test",
+      "script": {
+        "type": "text/javascript",
+        "exec": [
+          "// Global response validation",
+          "if (pm.response.code >= 400) {",
+          "    console.log('Error Response:', pm.response.text());",
+          "}",
+          "",
+          "// Log successful responses for debugging",
+          "if (pm.response.code >= 200 && pm.response.code < 300) {",
+          "    console.log('Success:', pm.info.requestName);",
+          "}"
+        ]
+      }
+    }
+  ]
+}

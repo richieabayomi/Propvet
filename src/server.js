@@ -9,7 +9,7 @@ require("dotenv").config();
 
 const {handleAPIWhitlistEndponts} = require("./misc/middlewares/health-checks");
 const authRoutes = require('./routes/auth.routes');
-const verificationRoutes = require('./routes/verification.routes');
+const verificationRoutes = require('./routes/verification.routes.updated');
 
 
 

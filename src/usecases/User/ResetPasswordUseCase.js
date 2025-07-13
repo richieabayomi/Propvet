@@ -8,7 +8,7 @@ const userRepository = new UserRepository();
 
 class ResetPasswordUseCase {
   async execute({ email, token, new_password }) {
-    if (!email || !isString(email) || !isEmail(email)) {
+    if (!email || !isString(email) ) {
       throw new BadRequestError("A valid email is required.");
     }
     if (!token || !isString(token)) {

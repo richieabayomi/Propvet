@@ -110,6 +110,25 @@ class VerificationRepository {
       .populate('user', 'username email role')
       .populate('documents');
   }
+
+  async updateVerification(verificationId, updateData) {
+    return Verification.findByIdAndUpdate(verificationId, updateData, { new: true });
+  }
+
+  async getVerificationByPaymentReference(paymentReference) {
+    return Verification.findOne({ payment_reference: paymentReference })
+      .populate('user', 'username email role')
+      .populate('documents');
+  }
+
+  async getVerificationByDocumentId(documentId) {
+    const document = await VerificationDocument.findById(documentId);
+    if (!document) return null;
+    
+    return Verification.findById(document.verification)
+      .populate('user', 'username email role')
+      .populate('documents');
+  }
 }
 
 module.exports = new VerificationRepository();

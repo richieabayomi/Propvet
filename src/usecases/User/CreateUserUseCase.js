@@ -2,6 +2,7 @@ const bcrypt = require('bcrypt');
 const UserRepository = require('../../infrastructure/Repository/user.repository');
 const BadRequestError = require('../../misc/errors/BadRequestError');
 const { isString } = require('../../misc/services/data-types');
+const { sendMail, emailTemplates } = require('../../misc/services/mail');
 
 const userRepository = new UserRepository();
 
@@ -60,6 +61,23 @@ class CreateUserUseCase {
       last_password_update_timestamp: new Date(),
       last_login_timestamp: null
     });
+
+    // Send welcome email
+    try {
+      const loginUrl = `${process.env.FRONTEND_URL || 'http://localhost:3000'}/login`;
+      const userName = first_name || username;
+      const emailTemplate = emailTemplates.welcome(userName, loginUrl);
+      
+      await sendMail({
+        to: email,
+        subject: emailTemplate.subject,
+        text: emailTemplate.text,
+        html: emailTemplate.html
+      });
+    } catch (emailError) {
+      console.error('Failed to send welcome email:', emailError);
+      // Don't throw error - user creation should succeed even if email fails
+    }
 
     delete user.password;
     return user;

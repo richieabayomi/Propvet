@@ -12,7 +12,7 @@ class GetAllVerificationsUseCase {
 
 class GetVerificationsByUserIdUseCase {
   async execute({ userId, page = 1, limit = 10 }) {
-    if (!userId || !isValidMongoId(userId)) throw new BadRequestError('A valid userId is required.');
+    if (!userId) throw new BadRequestError('A valid userId is required.');
     if (!isInteger(page) || page < 1) throw new BadRequestError('Page must be a positive integer.');
     if (!isInteger(limit) || limit < 1) throw new BadRequestError('Limit must be a positive integer.');
     return verificationRepository.getVerificationsByUserId(userId, page, limit);

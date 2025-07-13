@@ -3,7 +3,7 @@ const UserRepository = require('../../infrastructure/Repository/user.repository'
 const BadRequestError = require('../../misc/errors/BadRequestError');
 const NotFoundError = require('../../misc/errors/NotFoundError');
 const { isString, isEmail } = require('../../misc/services/data-types');
-const { sendMail } = require('../../misc/services/mail');
+const { sendMail, emailTemplates } = require('../../misc/services/mail');
 
 const userRepository = new UserRepository();
 
@@ -16,7 +16,7 @@ class ForgotPasswordUseCase {
       throw new NotFoundError("User not found.");
     }
 
-    const resetToken = crypto.randomBytes(32).toString('hex');
+    const otp = (parseInt(crypto.randomBytes(4).toString('hex'), 16) % 900000 + 100000).toString();
     const expires = new Date(Date.now() + 3600000); // 1 hour
 
     await userRepository.updateUser(user.id, {
@@ -24,16 +24,17 @@ class ForgotPasswordUseCase {
       permissions: [...new Set([...user.permissions, "RESET_PASSWORD"])], // optional
     });
 
-    // Send password reset email
-    const resetLink = `${process.env.FRONTEND_URL || 'http://localhost:3000'}/reset-password?token=${resetToken}&email=${encodeURIComponent(email)}`;
+    const userName = user.first_name || user.username || 'User';
+    const emailTemplate = emailTemplates.passwordReset(userName, otp);
+    
     await sendMail({
       to: email,
-      subject: 'Password Reset Request',
-      text: `You requested a password reset. Use this link: ${resetLink} (valid for 1 hour)`,
-      html: `<p>You requested a password reset.</p><p><a href="${resetLink}">Reset Password</a></p><p>This link is valid for 1 hour.</p>`
+      subject: emailTemplate.subject,
+      text: emailTemplate.text,
+      html: emailTemplate.html
     });
 
-    return { reset_token: resetToken, expires };
+    return { expires };
   }
 }
 

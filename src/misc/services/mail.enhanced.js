@@ -1,38 +1,15 @@
 const nodemailer = require('nodemailer');
 
-// Create transporter with better Gmail compatibility
-function createTransporter() {
-  const config = {
-    host: process.env.SMTP_HOST || 'smtp.gmail.com',
-    port: parseInt(process.env.SMTP_PORT) || 587,
-    secure: false, // true for 465, false for other ports
-    auth: {
-      user: process.env.SMTP_USER,
-      pass: process.env.SMTP_PASS,
-    },
-    tls: {
-      rejectUnauthorized: false,
-      ciphers: 'SSLv3'
-    },
-    connectionTimeout: 60000, // 60 seconds
-    greetingTimeout: 30000,   // 30 seconds
-    socketTimeout: 60000,     // 60 seconds
-  };
-
-  // Gmail-specific optimizations
-  if (config.host.includes('gmail')) {
-    config.service = 'gmail';
-    config.pool = true;
-    config.maxConnections = 1;
-    config.rateDelta = 20000;
-    config.rateLimit = 5;
-  }
-
-  return nodemailer.createTransport(config);
-}
-
 // Configure your SMTP transport here
-const transporter = createTransporter();
+const transporter = nodemailer.createTransporter({
+  host: process.env.SMTP_HOST || 'smtp.gmail.com',
+  port: process.env.SMTP_PORT || 587,
+  secure: false, // true for 465, false for other ports
+  auth: {
+    user: process.env.SMTP_USER,
+    pass: process.env.SMTP_PASS,
+  },
+});
 
 // Verify transporter configuration
 transporter.verify((error, success) => {
@@ -104,38 +81,39 @@ const emailTemplates = {
     `
   }),
 
-passwordReset: (userName, otp) => ({
-  subject: 'Reset Your Propvet Password',
-  text: `Hello ${userName}, You requested a password reset. Use this OTP: ${otp} (valid for 1 hour)`,
-  html: `
-    <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto; padding: 20px; background-color: #f4f4f4;">
-      <div style="background-color: white; padding: 30px; border-radius: 10px; box-shadow: 0 2px 10px rgba(0,0,0,0.1);">
-        <div style="text-align: center; margin-bottom: 30px;">
-          <h1 style="color: #2E7D32; margin: 0;">Password Reset Request</h1>
-        </div>
-        
-        <div style="color: #333; line-height: 1.6;">
-          <h2 style="color: #2E7D32;">Hello ${userName},</h2>
-          <p>We received a request to reset your Propvet account password.</p>
-          
-          <div style="background-color: #FFF3E0; padding: 20px; border-radius: 8px; margin: 20px 0; border-left: 4px solid #FF9800; text-align: center;">
-            <p style="margin: 0; font-size: 18px;"><strong>Your One-Time Password (OTP):</strong></p>
-            <p style="margin: 10px 0; font-size: 32px; font-weight: bold; color: #2E7D32;">${otp}</p>
-            <p style="margin: 0;">This OTP is valid for 1 hour.</p>
+  passwordReset: (userName, resetLink) => ({
+    subject: 'Reset Your Propvet Password',
+    text: `Hello ${userName}, You requested a password reset. Use this link: ${resetLink} (valid for 1 hour)`,
+    html: `
+      <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto; padding: 20px; background-color: #f4f4f4;">
+        <div style="background-color: white; padding: 30px; border-radius: 10px; box-shadow: 0 2px 10px rgba(0,0,0,0.1);">
+          <div style="text-align: center; margin-bottom: 30px;">
+            <h1 style="color: #2E7D32; margin: 0;">Password Reset Request</h1>
           </div>
           
-          <p>If you didn't request this password reset, please ignore this email. Your password will remain unchanged.</p>
-          <p>Best regards,<br><strong>The Propvet Team</strong></p>
+          <div style="color: #333; line-height: 1.6;">
+            <h2 style="color: #2E7D32;">Hello ${userName},</h2>
+            <p>We received a request to reset your Propvet account password.</p>
+            
+            <div style="background-color: #FFF3E0; padding: 20px; border-radius: 8px; margin: 20px 0; border-left: 4px solid #FF9800;">
+              <p style="margin: 0;"><strong>Important:</strong> This link will expire in 1 hour for security reasons.</p>
+            </div>
+            
+            <div style="text-align: center; margin: 30px 0;">
+              <a href="${resetLink}" style="background-color: #FF9800; color: white; padding: 12px 30px; text-decoration: none; border-radius: 5px; font-weight: bold;">Reset Password</a>
+            </div>
+            
+            <p>If you didn't request this password reset, please ignore this email. Your password will remain unchanged.</p>
+            <p>Best regards,<br><strong>The Propvet Team</strong></p>
+          </div>
+        </div>
+        
+        <div style="text-align: center; margin-top: 20px; color: #666; font-size: 12px;">
+          <p>© 2025 Propvet. All rights reserved.</p>
         </div>
       </div>
-      
-      <div style="text-align: center; margin-top: 20px; color: #666; font-size: 12px;">
-        <p>© 2025 Propvet. All rights reserved.</p>
-      </div>
-    </div>
-  `
-}),
-
+    `
+  }),
 
   verificationCreated: (userName, verificationType, verificationId, paymentUrl) => ({
     subject: 'New Verification Created - Complete Payment to Continue',

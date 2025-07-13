@@ -11,6 +11,7 @@
     "doctor": "node ./scripts/system-doctor.js",
     "doctor:fix": "node ./scripts/system-doctor.js --fix",
     "email-test": "node ./test-email.js",
+    "email-test-quick": "node ./scripts/email-test-quick.js",
     "email-diagnostics": "node ./scripts/email-diagnostics.js",
     "seed:admin": "node ./scripts/seed-admin.js",
     "seed:prices": "node ./scripts/seed-verification-prices.js",

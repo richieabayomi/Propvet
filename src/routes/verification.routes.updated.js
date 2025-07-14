@@ -3,8 +3,23 @@ const router = express.Router();
 const VerificationController = require('../controller/verification/VerificationController');
 const authorizationMiddleware = require('../misc/middlewares/authorization-middleware');
 const { checkPaymentStatus, checkPaymentStatusForAdmin } = require('../misc/middlewares/payment-validation-middleware');
-const upload = require('../misc/middlewares/upload-middleware');
-const { uploadErrorHandler } = require('../misc/middlewares/upload-middleware');
+
+// Multer setup for file uploads
+const multer = require('multer');
+const upload = multer();
+
+// Optional: error handler for multer
+function uploadErrorHandler(err, req, res, next) {
+  if (err) {
+    return res.status(400).json({
+      code: 400,
+      error: 'BAD_REQUEST_ERROR',
+      status: 'error',
+      msg: err.message || 'File upload error.'
+    });
+  }
+  next();
+}
 
 // Payment-integrated verification creation
 router.post('/create', authorizationMiddleware(), VerificationController.createVerification);
@@ -17,10 +32,17 @@ router.get('/payment-callback/:verificationId', VerificationController.paymentCa
 //router.post('/payment-webhook', VerificationController.paymentWebhook);
 
 // Document operations (require payment completion)
-router.post('/add-document', authorizationMiddleware(), checkPaymentStatus, upload.single('file'), uploadErrorHandler, VerificationController.addDocument);
+// Debug log middleware for /add-document
+function debugLogMiddleware(req, res, next) {
+  console.log('DEBUG /add-document req.body:', req.body);
+  console.log('DEBUG /add-document req.file:', req.file);
+  next();
+}
 
+router.post('/add-document', authorizationMiddleware(), upload.single('file'), debugLogMiddleware, checkPaymentStatus, uploadErrorHandler, VerificationController.addDocument);
+//router.post('/add-document', debugLogMiddleware, upload.single('file'), VerificationController.addDocument);
 // Admin operations (require payment completion)
-router.patch('/update-document-status', authorizationMiddleware(['ADMIN']), checkPaymentStatusForAdmin, VerificationController.updateDocumentStatus);
+router.patch('/update-document-status', debugLogMiddleware, authorizationMiddleware(['ADMIN']), checkPaymentStatusForAdmin, VerificationController.updateDocumentStatus);
 
 // Comment operations (require payment completion)
 router.post('/add-comment', authorizationMiddleware(), checkPaymentStatus, VerificationController.addComment);

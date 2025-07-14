@@ -25,6 +25,13 @@ app.use(express.urlencoded({ extended: true }));
 app.use(express.json());
 app.use(cors({}));
 
+// Multer setup for handling multipart/form-data
+const multer = require('multer');
+const upload = multer();
+
+// Export upload for use in route files
+module.exports.upload = upload;
+
 //HANDLE ROUTES
 // app.use('/v1/route', handlers);
 // app.use('/v1/user', UserAdminRoutes);

@@ -5,7 +5,7 @@ const BadRequestError = require('../../misc/errors/BadRequestError');
 
 class AddDocumentToVerificationUseCase {
   async execute({ verificationId, name, file_url }) {
-    if (!verificationId || !isValidMongoId(verificationId)) {
+    if (!verificationId) {
       throw new BadRequestError('A valid verificationId is required.');
     }
     if (!name || !isString(name)) {

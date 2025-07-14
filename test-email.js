@@ -1,4 +1,4 @@
-const { sendMail, emailTemplates } = require('./src/misc/services/mail');
+const { sendMail, emailTemplates } = require('./src/misc/services/mail.simple');
 require('dotenv').config();
 
 async function testEmailSetup() {
@@ -19,7 +19,7 @@ async function testEmailSetup() {
   const welcomeTemplate = emailTemplates.welcome('Test User', 'http://localhost:5000/login');
   console.log('✅ Welcome template created');
   
-  const resetTemplate = emailTemplates.passwordReset('Test User', 'http://localhost:5000/reset');
+  const resetTemplate = emailTemplates.passwordReset('Test User', '123456');
   console.log('✅ Password reset template created');
   
   const verificationTemplate = emailTemplates.verificationCreated('Test User', 'NORMAL', '12345', 'http://paystack.com');

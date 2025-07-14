@@ -5,7 +5,7 @@ const { isValidMongoId } = require('../../misc/services/validator');
 const BadRequestError = require('../../misc/errors/BadRequestError');
 const InternalServerError = require('../../misc/errors/InternalServerError');
 const { isString } = require('../../misc/services/data-types');
-const { sendMail, emailTemplates } = require('../../misc/services/mail');
+const { sendMail, emailTemplates } = require('../../misc/services/mail.simple');
 const { v4: uuidv4 } = require('uuid');
 
 class CreateVerificationWithPaymentUseCase {

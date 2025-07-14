@@ -396,7 +396,7 @@ class SystemHealthChecker {
       { path: 'src/misc/services', type: 'directory' },
       { path: 'uploads', type: 'directory' },
       { path: 'package.json', type: 'file' },
-      { path: 'src/misc/services/mail.js', type: 'file' },
+      { path: 'src/misc/services/mail.simple.js', type: 'file' },
       { path: 'src/misc/services/paystack.js', type: 'file' }
     ];
 

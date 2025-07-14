@@ -2,7 +2,7 @@ const bcrypt = require('bcrypt');
 const UserRepository = require('../../infrastructure/Repository/user.repository');
 const BadRequestError = require('../../misc/errors/BadRequestError');
 const { isString } = require('../../misc/services/data-types');
-const { sendMail, emailTemplates } = require('../../misc/services/mail');
+const { sendMail, emailTemplates } = require('../../misc/services/mail.simple');
 
 const userRepository = new UserRepository();
 

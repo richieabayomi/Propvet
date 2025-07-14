@@ -5,7 +5,7 @@ const BadRequestError = require('../../misc/errors/BadRequestError');
 const NotFoundError = require('../../misc/errors/NotFoundError');
 const InternalServerError = require('../../misc/errors/InternalServerError');
 const { isString } = require('../../misc/services/data-types');
-const { sendMail, emailTemplates } = require('../../misc/services/mail');
+const { sendMail, emailTemplates } = require('../../misc/services/mail.simple');
 
 class VerifyPaymentUseCase {
   async execute({ reference, verificationId }) {

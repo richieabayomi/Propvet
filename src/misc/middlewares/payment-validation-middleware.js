@@ -7,6 +7,7 @@ const AuthorizationError = require('../errors/AuthorizationError');
  */
 async function checkPaymentStatus(req, res, next) {
   try {
+    console.log(req.body);
     const { verificationId } = req.body;
     
     if (!verificationId) {
@@ -43,7 +44,6 @@ async function checkPaymentStatusForAdmin(req, res, next) {
     if (verificationId) {
       verification = await verificationRepository.getVerificationById(verificationId);
     } else if (documentId) {
-      // Get verification through document
       verification = await verificationRepository.getVerificationByDocumentId(documentId);
     }
     

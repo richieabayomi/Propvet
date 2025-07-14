@@ -101,10 +101,11 @@ module.exports = {
     try {
       const { verificationId, name } = req.body;
       let file_url = req.body.file_url;
+
       if (req.file) {
-        // Save the relative path or URL to the uploaded file
         file_url = `/uploads/${req.file.filename}`;
       }
+      
       const document = await addDocumentToVerificationUseCase.execute({ verificationId, name, file_url });
       return ApiResponse.ok(res, { document }, 201);
     } catch (err) {
@@ -204,7 +205,6 @@ module.exports = {
   },
 
   async paymentWebhook(req, res) {
-    // Only allow POST requests for webhook
     if (req.method !== 'POST') {
       return res.status(405).json({
         success: false,
@@ -248,5 +248,6 @@ module.exports = {
         message: 'Webhook processing failed'
       });
     }
-  },
+  }
+
 };
